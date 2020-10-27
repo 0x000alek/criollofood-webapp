@@ -31,8 +31,6 @@ public class FindUsuarioByUsernameSP extends StoredProcedure {
         declareParameter(new SqlOutParameter("o_first_name", Types.VARCHAR));
         declareParameter(new SqlOutParameter("o_last_name", Types.VARCHAR));
         declareParameter(new SqlOutParameter("o_email", Types.VARCHAR));
-        declareParameter(new SqlOutParameter("o_grupo_id", Types.NUMERIC));
-        declareParameter(new SqlOutParameter("o_grupo_name", Types.VARCHAR));
         compile();
     }
 
@@ -46,15 +44,7 @@ public class FindUsuarioByUsernameSP extends StoredProcedure {
         mappedUsuario.setPassword((String) resultMap.get("o_password"));
         mappedUsuario.setEmail((String) resultMap.get("o_email"));
 
-        Grupo mappedGrupo = new Grupo();
-
-        mappedGrupo.setId((BigDecimal) resultMap.get("o_grupo_id"));
-        mappedGrupo.setName((String) resultMap.get("o_grupo_name"));
-
-        mappedUsuario.setRol(mappedGrupo);
-
-        LOGGER.info(mappedUsuario.toString());
-
         return mappedUsuario;
     }
+
 }
