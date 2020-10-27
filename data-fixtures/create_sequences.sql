@@ -1,9 +1,3 @@
-CREATE SEQUENCE grupos_seq
-    START WITH     500
-    INCREMENT BY   1
-    NOCACHE
-    NOCYCLE;
-
 CREATE SEQUENCE usuarios_seq
     START WITH     1000
     INCREMENT BY   1
