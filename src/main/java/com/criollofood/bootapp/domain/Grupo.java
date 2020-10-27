@@ -2,14 +2,14 @@ package com.criollofood.bootapp.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
 public class Grupo implements Serializable {
     private static final long serialVersionUID = 6492069354444265000L;
 
     private BigDecimal id;
     private String name;
-    private Set<Permiso> permisoSet;
+    private List<Permiso> permisos;
 
     public BigDecimal getId() {
         return id;
@@ -27,20 +27,20 @@ public class Grupo implements Serializable {
         this.name = name;
     }
 
-    public Set<Permiso> getPermisoSet() {
-        return permisoSet;
+    public List<Permiso> getPermisos() {
+        return permisos;
     }
 
-    public void setPermisoSet(Set<Permiso> permisoSet) {
-        this.permisoSet = permisoSet;
+    public void setPermisos(List<Permiso> permisos) {
+        this.permisos = permisos;
     }
 
     @Override
     public String toString() {
-        return "Rol{" +
+        return "Grupo{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", permisoSet=" + permisoSet +
+                ", permisos=" + permisos +
                 '}';
     }
 }

@@ -4,6 +4,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class Usuario implements Serializable {
     private static final long serialVersionUID = 3731733605737805482L;
@@ -20,7 +21,8 @@ public class Usuario implements Serializable {
     @NotEmpty(message = "*Porfavor ingresa tu email")
     @Email(message = "*Porfavor ingresa un email válido")
     private String email;
-    private Grupo grupo;
+
+    private List<Grupo> grupos;
 
     public BigDecimal getId() {
         return id;
@@ -70,12 +72,12 @@ public class Usuario implements Serializable {
         this.email = email;
     }
 
-    public Grupo getRol() {
-        return grupo;
+    public List<Grupo> getGrupos() {
+        return grupos;
     }
 
-    public void setRol(Grupo grupo) {
-        this.grupo = grupo;
+    public void setGrupos(List<Grupo> grupos) {
+        this.grupos = grupos;
     }
 
     @Override
@@ -87,7 +89,7 @@ public class Usuario implements Serializable {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", rol=" + grupo +
+                ", grupos=" + grupos +
                 '}';
     }
 }

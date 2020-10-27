@@ -1,11 +1,16 @@
 package com.criollofood.bootapp.controller;
 
+import com.criollofood.bootapp.domain.Grupo;
+import com.criollofood.bootapp.domain.Permiso;
 import com.criollofood.bootapp.domain.Usuario;
 import com.criollofood.bootapp.service.UsuarioService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -13,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class LoginController {
@@ -21,7 +29,15 @@ public class LoginController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @GetMapping(value={"/", "/login"})
+    @GetMapping(value= "/")
+    public ModelAndView index(){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+
+        return modelAndView;
+    }
+
+    @GetMapping(value = "/login")
     public ModelAndView login(){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("login");
@@ -29,7 +45,7 @@ public class LoginController {
         return modelAndView;
     }
 
-    @GetMapping(value="/signup")
+    @GetMapping(value = "/signup")
     public ModelAndView signup(){
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("user", new Usuario());
@@ -39,11 +55,9 @@ public class LoginController {
     }
 
     @PostMapping(value = "/signup")
-    public ModelAndView createNewUser(@Valid @ModelAttribute("user") Usuario user, BindingResult bindingResult) {
+    public ModelAndView signup(@Valid @ModelAttribute("user") Usuario user, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
-        boolean userExists = usuarioService.isUsuarioExists(user.getUsername());
-        LOGGER.info("user exists? " + userExists);
-        if (userExists) {
+        if (usuarioService.isUsuarioExists(user.getUsername())) {
             bindingResult
                     .rejectValue("username", "error.user",
                             "*El username ingresado no esta disponible");
@@ -51,25 +65,29 @@ public class LoginController {
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("signup");
         } else {
-            usuarioService.createUsuario(user);
-            modelAndView.addObject("successMessage", "Te has registrado con éxito");
-            modelAndView.addObject("user", new Usuario());
-            modelAndView.setViewName("signup");
+            Usuario signedUpUser = usuarioService.createUsuario(user);
+            authWithoutPassword(signedUpUser);
 
+            return new ModelAndView("redirect:/");
         }
+
         return modelAndView;
     }
 
-    @RequestMapping(value="/home", method = RequestMethod.GET)
-    public ModelAndView home(){
-        ModelAndView modelAndView = new ModelAndView();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Usuario user = usuarioService.findByUsername(auth.getName());
-        modelAndView.addObject("username", "Bienvenido/a " + user.getUsername() + " (" + user.getEmail() + ")");
-        modelAndView.addObject("message","El contenido de esta página es sólo para usuarios registrados");
-        modelAndView.setViewName("home");
+    private void authWithoutPassword(Usuario user) {
+        List<Permiso> privileges = user.getGrupos()
+                .stream()
+                .map(Grupo::getPermisos)
+                .flatMap(Collection::stream)
+                .distinct()
+                .collect(Collectors.toList());
 
-        return modelAndView;
+        List<GrantedAuthority> authorities = privileges.stream()
+                .map(p -> new SimpleGrantedAuthority(p.getName()))
+                .collect(Collectors.toList());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
 }

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 public class LoginPageFilter extends GenericFilterBean {
@@ -23,7 +24,7 @@ public class LoginPageFilter extends GenericFilterBean {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (isAuthenticated() && new HashSet<>(Arrays.asList("/", "/login")).contains(request.getRequestURI())) {
+        if (isAuthenticated() && new HashSet<>(Collections.singletonList("/login")).contains(request.getRequestURI())) {
 
             String encodedRedirectURL = response.encodeRedirectURL(
                     request.getContextPath() + "/home");

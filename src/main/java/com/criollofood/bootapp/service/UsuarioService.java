@@ -10,14 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 public class UsuarioService {
     private static final Logger LOGGER = LogManager.getLogger(UsuarioService.class);
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private GrupoService grupoService;
 
     @Autowired
     private CreateUsuarioSP createUsuarioSP;
@@ -29,15 +30,18 @@ public class UsuarioService {
     public Usuario createUsuario(Usuario usuario) {
         usuario.setPassword(bCryptPasswordEncoder.encode(usuario.getPassword()));
         createUsuarioSP.execute(usuario);
-        return usuario;
+
+        return findByUsername(usuario.getUsername());
     }
 
     public Usuario findByUsername(String username) {
-        LOGGER.info("finding " + username);
-        if (Objects.isNull(username) || username.trim().isEmpty() || !isUsuarioExists(username)) {
-            return null;
+        if (isUsuarioExists(username)) {
+            Usuario foundUsuario = findUsuarioByUsernameSP.execute(username);
+            foundUsuario.setGrupos(grupoService.findByIdUsuario(foundUsuario.getId()));
+
+            return foundUsuario;
         }
-        return findUsuarioByUsernameSP.execute(username);
+        return null;
     }
 
     public boolean isUsuarioExists(String username) {
