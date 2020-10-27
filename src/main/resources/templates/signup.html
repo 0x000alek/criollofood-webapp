@@ -17,7 +17,7 @@
         <div class="col-md-6">
             <img th:src="@{/images/criollo-food-logo.png}" class="mx-auto d-block" width="200" height="200" alt="Logo"/>
             <form autocomplete="off" action="#" th:action="@{/signup}" method="POST" class="form-horizontal"
-                  th:object="${user}" role="form">
+                  th:object="${user}" role="form" th:autocomplete="off">
                 <div class="form-group">
                     <div class="col-md-12">
                         <input type="text" th:field="*{firstName}" placeholder="Name"
