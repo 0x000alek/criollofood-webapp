@@ -29,6 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         String loginPage = "/login";
         String logoutPage = "/logout";
+        String homePage = "/";
 
         http
                 .addFilterAfter(new LoginPageFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -41,19 +42,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .formLogin()
                 .loginPage(loginPage)
-                .loginPage("/")
                 .failureUrl("/login?error=true")
-                .defaultSuccessUrl("/home")
+                .defaultSuccessUrl(homePage)
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .and().logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher(logoutPage))
-                .logoutSuccessUrl(loginPage).and().exceptionHandling();
+                .logoutSuccessUrl(homePage).and().exceptionHandling();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
+        web.ignoring().antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**", "/vendor/**");
     }
 
 }
