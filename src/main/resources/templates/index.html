@@ -1,10 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Spring Security Tutorial</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" type="image/vnd.microsoft.icon" th:href="@{/images/criollo-food.ico}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+
+    <script src="https://use.fontawesome.com/b8a385fb84.js"></script>
 </head>
 <body>
-    <h4>Welcome to Thymeleaf Spring Boot web application</h4>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" th:href="@{/}">
+        <img th:src="@{/images/criollo-food-logo.png}" width="70" height="70" class="d-inline-block align-top" alt="" loading="lazy">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto" sec:authorize="isAuthenticated()">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/reservas}"><span><i class="fa fa-calendar pr-1" aria-hidden="true"></i>Reservaciones</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}"><span><i class="fa fa-sign-out pr-1" aria-hidden="true"></i>Salir</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div sec:authorize="isAuthenticated()" class="panel-heading pl-2 pr-2" style="background-color: #62D100; color: ghostwhite;">
+    <div>Bienvenido/a <span sec:authentication="name"></span></div>
+</div>
+<div class="jumbotron jumbotron-image text-center">
+    <h1 class="display-4 text-white">Reserva Online! Sin filas ni listas de espera</h1>
+    <hr class="my-4">
+    <a class="btn btn-outline-light btn-lg" th:href="@{/reservas}" role="button">RESERVA AQU&Iacute;</a>
+</div>
+<div class="container">
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 </body>
 </html>
