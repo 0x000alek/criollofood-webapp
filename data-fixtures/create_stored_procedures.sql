@@ -114,5 +114,119 @@ BEGIN
         where grppms.GRUPO_ID = i_grupo_id;
 END FIND_PERMISOS_BY_ID_GRUPO;
 
+-- CLIENTES
+
+CREATE OR REPLACE
+PROCEDURE FIND_CLIENTE_BY_CORREO
+(i_correo IN CLIENTES.correo%TYPE,
+ o_id OUT CLIENTES.id%TYPE,
+ o_nombre OUT CLIENTES.nombre%TYPE,
+ o_telefono OUT CLIENTES.telefono%TYPE) AS
+BEGIN
+    select
+        id,
+        nombre,
+        telefono
+    into
+        o_id,
+        o_nombre,
+        o_telefono
+    from CLIENTES
+    where correo = i_correo;
+END FIND_CLIENTE_BY_CORREO;
+
+CREATE OR REPLACE
+PROCEDURE CREATE_CLIENTE
+(i_nombre IN CLIENTES.nombre%TYPE,
+ i_telefono IN CLIENTES.telefono%TYPE,
+ i_correo IN CLIENTES.correo%TYPE,
+ o_sql_code OUT NUMBER) AS
+    v_cliente_id NUMBER;
+BEGIN
+    v_cliente_id := CLIENTES_SEQ.nextval;
+
+    insert into CLIENTES (ID, NOMBRE, TELEFONO, CORREO) values (v_cliente_id, i_nombre, i_telefono, i_correo);
+
+    o_sql_code := 0;
+
+    commit;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 1;
+END CREATE_CLIENTE;
+
+CREATE OR REPLACE
+PROCEDURE VALIDATE_CLIENTE_EXISTS
+(i_correo IN CLIENTES.correo%TYPE,
+ o_sql_code OUT NUMBER) AS
+    v_cliente_id NUMBER;
+BEGIN
+    o_sql_code := 0;
+    select id into v_cliente_id from CLIENTES where correo = i_correo;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        o_sql_code := 1;
+END VALIDATE_CLIENTE_EXISTS;
+
+-- RESERVACIOONES
+
+CREATE OR REPLACE
+PROCEDURE CREATE_RESERVACION
+(i_fecha IN RESERVACIONES.FECHA%TYPE,
+ i_asistentes IN RESERVACIONES.ASISTENTES%TYPE,
+ i_cliente_id IN RESERVACIONES.CLIENTE_ID%TYPE,
+ o_sql_code OUT NUMBER) AS
+    v_id NUMBER;
+    v_codigo_reservacion VARCHAR2(10);
+BEGIN
+    v_id := RESERVACIONES_SEQ.nextval;
+    v_codigo_reservacion := 'RSV-' || LPAD(TO_CHAR(v_id), 6, '0');
+
+    insert into RESERVACIONES (ID, FECHA, ASISTENTES, CODIGO, ESTADO, CLIENTE_ID)
+    values (v_id, i_fecha, i_asistentes, v_codigo_reservacion, 'CONFIRMADA', i_cliente_id);
+
+    o_sql_code := 0;
+
+    commit;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 1;
+END CREATE_RESERVACION;
+
+CREATE OR REPLACE
+PROCEDURE FIND_RESERVACIONES_BY_ID_CLIENTE
+(i_cliente_id IN RESERVACIONES.CLIENTE_ID%TYPE,
+ o_reservaciones_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_reservaciones_cursor for
+        select
+            id,
+            fecha,
+            asistentes,
+            codigo,
+            estado
+        from RESERVACIONES
+        where cliente_id = i_cliente_id
+        order by fecha desc;
+END FIND_RESERVACIONES_BY_ID_CLIENTE;
+
+CREATE OR REPLACE
+PROCEDURE DELETE_RESERVACION
+(i_id IN RESERVACIONES.ID%TYPE,
+ o_sql_code OUT NUMBER) AS
+BEGIN
+
+    update RESERVACIONES
+        set estado = 'CANCELADA'
+    where id = i_id;
+
+    o_sql_code := 0;
+
+    commit;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 1;
+END DELETE_RESERVACION;
+
 
 COMMIT;

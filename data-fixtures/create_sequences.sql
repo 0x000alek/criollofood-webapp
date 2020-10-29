@@ -4,4 +4,17 @@ CREATE SEQUENCE usuarios_seq
     NOCACHE
     NOCYCLE;
 
+CREATE SEQUENCE clientes_seq
+    START WITH     1000
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
+
+CREATE SEQUENCE reservaciones_seq
+    START WITH     10
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
+
+
 COMMIT;

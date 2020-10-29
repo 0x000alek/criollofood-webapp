@@ -1,6 +1,5 @@
 package com.criollofood.bootapp.utils;
 
-import com.criollofood.bootapp.domain.Grupo;
 import com.criollofood.bootapp.domain.Usuario;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -21,13 +20,6 @@ public class UsuarioRowMapper implements RowMapper<Usuario> {
         mappedUsuario.setFirstName(resultSet.getString("o_first_name"));
         mappedUsuario.setLastName(resultSet.getString("o_last_name"));
         mappedUsuario.setEmail(resultSet.getString("o_email"));
-
-        Grupo mappedGrupo = new Grupo();
-
-        mappedGrupo.setId(resultSet.getBigDecimal("o_role_id"));
-        mappedGrupo.setName(resultSet.getString("o_role_name"));
-
-        mappedUsuario.setRol(mappedGrupo);
 
         return mappedUsuario;
     }

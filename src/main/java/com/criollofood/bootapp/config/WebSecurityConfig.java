@@ -15,10 +15,17 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CriolloFoodUserDetailsService userDetailsService;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final CriolloFoodUserDetailsService userDetailsService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final LoginPageFilter loginPageFilter;
+
+    public WebSecurityConfig(@Autowired CriolloFoodUserDetailsService userDetailsService,
+                             @Autowired BCryptPasswordEncoder bCryptPasswordEncoder,
+                             @Autowired LoginPageFilter loginPageFilter) {
+        this.userDetailsService = userDetailsService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.loginPageFilter = loginPageFilter;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,15 +39,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         String homePage = "/";
 
         http
-                .addFilterAfter(new LoginPageFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(loginPageFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
+                .antMatchers("/reservar").permitAll()
                 .antMatchers(loginPage).permitAll()
                 .antMatchers("/signup").permitAll()
                 .anyRequest()
-                .authenticated()
-                .and().csrf().disable()
-                .formLogin()
+                .authenticated().and().csrf().disable().formLogin()
                 .loginPage(loginPage)
                 .failureUrl("/login?error=true")
                 .defaultSuccessUrl(homePage)

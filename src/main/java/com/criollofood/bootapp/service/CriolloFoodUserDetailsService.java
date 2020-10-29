@@ -1,7 +1,6 @@
 package com.criollofood.bootapp.service;
 
 import com.criollofood.bootapp.domain.Grupo;
-import com.criollofood.bootapp.domain.Permiso;
 import com.criollofood.bootapp.domain.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,19 +26,12 @@ public class CriolloFoodUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = usuarioService.findByUsername(username);
-        return buildUserForAuthentication(usuario, getUserAuthority(usuario));
+        return buildUserForAuthentication(usuario, getUserAuthority(usuario.getGrupos()));
     }
 
-    private List<GrantedAuthority> getUserAuthority(Usuario user) {
-        List<Permiso> privileges = user.getGrupos()
-                .stream()
-                .map(Grupo::getPermisos)
-                .flatMap(Collection::stream)
-                .distinct()
-                .collect(Collectors.toList());
-
-        return privileges.stream()
-                .map(p -> new SimpleGrantedAuthority(p.getName()))
+    private List<GrantedAuthority> getUserAuthority(List<Grupo> grupos) {
+        return grupos.stream()
+                .map(g -> new SimpleGrantedAuthority(g.getName()))
                 .collect(Collectors.toList());
     }
 

@@ -15,7 +15,7 @@
     <script src="https://use.fontawesome.com/b8a385fb84.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light pt-0 pb-0">
     <a class="navbar-brand" th:href="@{/}">
         <img th:src="@{/images/criollo-food-logo.png}" width="70" height="70" class="d-inline-block align-top" alt="" loading="lazy">
     </a>
@@ -26,7 +26,10 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto" sec:authorize="isAuthenticated()">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/reservas}"><span><i class="fa fa-calendar pr-1" aria-hidden="true"></i>Reservaciones</span></a>
+                <a class="nav-link" th:href="@{/reservaciones}"><span><i class="fa fa-calendar pr-1" aria-hidden="true"></i>Reservaciones</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/reservaciones}"><span><i class="fa fa-cutlery pr-1" aria-hidden="true"></i>Pedido</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/logout}"><span><i class="fa fa-sign-out pr-1" aria-hidden="true"></i>Salir</span></a>
@@ -40,7 +43,7 @@
 <div class="jumbotron jumbotron-image text-center">
     <h1 class="display-4 text-white">Reserva Online! Sin filas ni listas de espera</h1>
     <hr class="my-4">
-    <a class="btn btn-outline-light btn-lg" th:href="@{/reservas}" role="button">RESERVA AQU&Iacute;</a>
+    <a class="btn btn-outline-light btn-lg" th:href="@{/reservar}" role="button">RESERVA AQU&Iacute;</a>
 </div>
 <div class="container">
 </div>

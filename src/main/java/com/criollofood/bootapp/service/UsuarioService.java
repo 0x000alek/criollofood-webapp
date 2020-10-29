@@ -14,11 +14,8 @@ import org.springframework.stereotype.Service;
 public class UsuarioService {
     private static final Logger LOGGER = LogManager.getLogger(UsuarioService.class);
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private GrupoService grupoService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final GrupoService grupoService;
 
     @Autowired
     private CreateUsuarioSP createUsuarioSP;
@@ -26,6 +23,12 @@ public class UsuarioService {
     private FindUsuarioByUsernameSP findUsuarioByUsernameSP;
     @Autowired
     private ValidateUsuarioExistsSP validateUsuarioExistsSP;
+
+    public UsuarioService(@Autowired BCryptPasswordEncoder bCryptPasswordEncoder,
+                          @Autowired GrupoService grupoService) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.grupoService = grupoService;
+    }
 
     public Usuario createUsuario(Usuario usuario) {
         usuario.setPassword(bCryptPasswordEncoder.encode(usuario.getPassword()));

@@ -159,6 +159,15 @@ CREATE TABLE recetas (
 
 ALTER TABLE recetas ADD CONSTRAINT recetas_pk PRIMARY KEY ( id );
 
+CREATE TABLE reservaciones (
+    id              NUMBER NOT NULL,
+    fecha           DATE NOT NULL,
+    asistentes      INTEGER NOT NULL,
+    codigo          VARCHAR2(10) NOT NULL,
+    estado          VARCHAR2(10) NOT NULL,
+    cliente_id      NUMBER NOT NULL
+);
+
 CREATE TABLE unidades_medida (
     id           NUMBER NOT NULL,
     nombre       VARCHAR2(50) NOT NULL,

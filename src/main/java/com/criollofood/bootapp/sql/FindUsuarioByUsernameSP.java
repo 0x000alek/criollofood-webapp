@@ -1,6 +1,5 @@
 package com.criollofood.bootapp.sql;
 
-import com.criollofood.bootapp.domain.Grupo;
 import com.criollofood.bootapp.domain.Usuario;
 import com.criollofood.bootapp.utils.UsuarioRowMapper;
 import org.apache.logging.log4j.LogManager;

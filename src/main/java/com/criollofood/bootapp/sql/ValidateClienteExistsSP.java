@@ -13,18 +13,18 @@ import java.util.Collections;
 import java.util.Map;
 
 @Component
-public class ValidateUsuarioExistsSP extends StoredProcedure {
+public class ValidateClienteExistsSP extends StoredProcedure {
 
-    public ValidateUsuarioExistsSP(@Autowired DataSource dataSource) {
-        super(dataSource, "VALIDATE_USUARIO_EXISTS");
+    public ValidateClienteExistsSP(@Autowired DataSource dataSource) {
+        super(dataSource, "VALIDATE_CLIENTE_EXISTS");
 
-        declareParameter(new SqlParameter("i_username", OracleTypes.VARCHAR));
+        declareParameter(new SqlParameter("i_correo", OracleTypes.VARCHAR));
         declareParameter(new SqlOutParameter("o_sql_code", OracleTypes.NUMBER));
         compile();
     }
 
-    public boolean execute(String username) {
-        Map<String, Object> resultMap = super.execute(Collections.singletonMap("i_username", username));
+    public boolean execute(String correoCliente) {
+        Map<String, Object> resultMap = super.execute(Collections.singletonMap("i_correo", correoCliente));
         BigDecimal userExists = (BigDecimal) resultMap.get("o_sql_code");
 
         return userExists.compareTo(BigDecimal.ZERO) == 0;

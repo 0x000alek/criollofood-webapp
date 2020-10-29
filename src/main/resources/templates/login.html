@@ -17,18 +17,28 @@
 <div class="container">
     <img th:src="@{/images/criollo-food-logo.png}" class="mx-auto d-block" width="300" height="300" alt="Logo"/>
     <form th:action="@{/login}" method="POST" class="form-signin" th:autocomplete="off">
-        <input type="text" id="user_name" name="username" th:placeholder="Usuario"
-               class="form-control"/>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-transparent border-right-0"><i class="fa fa-user"></i></span>
+            </div>
+            <input type="text" id="user_name" name="username" th:placeholder="Usuario"
+                   class="form-control border-left-0"/>
+        </div>
         <br/>
-        <input type="password" th:placeholder="Contraseña"
-               id="password" name="password" class="form-control mb-0"/> <br/>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-transparent border-right-0"><i class="fa fa-lock"></i></span>
+            </div>
+            <input type="password" th:placeholder="Contraseña"
+                   id="password" name="password" class="form-control border-left-0 mb-0"/>
+        </div>
+        <br/>
 
         <div class="text-center" th:if="${param.error}">
             <label class="validation-message">Usuario o Contraseña invalido, intentalo nuevamente</label>
         </div>
         <button class="btn btn-primary btn-block" name="Submit" value="Login" type="Submit">INICIAR SESI&OacuteN</button>
     </form>
-    <p class="text-center"><a th:href="@{/signup}">Registrarse</a></p>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

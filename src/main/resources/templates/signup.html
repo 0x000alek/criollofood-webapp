@@ -16,11 +16,11 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <img th:src="@{/images/criollo-food-logo.png}" class="mx-auto d-block" width="200" height="200" alt="Logo"/>
-            <form autocomplete="off" action="#" th:action="@{/signup}" method="POST" class="form-horizontal"
-                  th:object="${user}" role="form" th:autocomplete="off">
+            <form action="#" th:action="@{/signup}" method="POST" class="form-horizontal"
+                  th:object="${user}" th:autocomplete="off">
                 <div class="form-group">
                     <div class="col-md-12">
-                        <input type="text" th:field="*{firstName}" placeholder="Name"
+                        <input type="text" th:field="*{firstName}" placeholder="Nombre"
                                class="form-control"/>
                         <label th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
                                class="validation-message"></label>
@@ -29,7 +29,7 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         <input type="text" th:field="*{lastName}"
-                               placeholder="Last Name" class="form-control"/>
+                               placeholder="Apellido" class="form-control"/>
                         <label th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
                                class="validation-message"></label>
                     </div>
@@ -67,8 +67,6 @@
                         <button type="submit" class="btn btn-primary btn-block">REGISTRARSE</button>
                     </div>
                 </div>
-
-                <h2><span class="text-success text-center" th:utext="${successMessage}"></span></h2>
 
             </form>
         </div>

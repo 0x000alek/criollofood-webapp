@@ -1,5 +1,6 @@
 package com.criollofood.bootapp.config;
 
+import com.criollofood.bootapp.utils.AuthenticationFacade;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,6 +12,11 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationFacade authenticationFacade() {
+        return new AuthenticationFacade();
     }
 
 }
