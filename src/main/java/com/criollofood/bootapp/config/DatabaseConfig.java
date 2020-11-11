@@ -32,8 +32,6 @@ public class DatabaseConfig {
     private String driverClassName;
     @NotNull
     private String walletLocation;
-    @NotNull
-    private boolean walletConnection;
 
     @Bean(name = "oracleDataSource")
     @Primary
@@ -52,10 +50,10 @@ public class DatabaseConfig {
 
             oracleDataSource.setConnectionProperties(props);
 
-            String dbUrl = walletConnection ? String.format("%s?TNS_ADMIN=%s", url, walletLocation) : url;
+            url = String.format("%s?TNS_ADMIN=%s", url, walletLocation);
 
             oracleDataSource.setDriverType(driverClassName);
-            oracleDataSource.setURL(dbUrl);
+            oracleDataSource.setURL(url);
             oracleDataSource.setUser(username);
             oracleDataSource.setPassword(password);
 
@@ -100,9 +98,5 @@ public class DatabaseConfig {
 
     public void setWalletLocation(String walletLocation) {
         this.walletLocation = walletLocation;
-    }
-
-    public void setWalletConnection(boolean walletConnection) {
-        this.walletConnection = walletConnection;
     }
 }
