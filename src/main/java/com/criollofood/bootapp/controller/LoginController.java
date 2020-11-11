@@ -10,19 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoginController {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
-    @GetMapping(value= "/index")
-    public ModelAndView index(){
-        return new ModelAndView("redirect:/");
-    }
-
-    @GetMapping(value= "/")
-    public ModelAndView home(){
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("index");
-
-        return modelAndView;
-    }
-
     @GetMapping(value = "/login")
     public ModelAndView login(){
         ModelAndView modelAndView = new ModelAndView();
@@ -30,5 +17,4 @@ public class LoginController {
 
         return modelAndView;
     }
-
 }

@@ -41,10 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .addFilterAfter(loginPageFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/reservar").permitAll()
-                .antMatchers(loginPage).permitAll()
-                .antMatchers("/signup").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest()
                 .authenticated().and().csrf().disable().formLogin()
                 .loginPage(loginPage)
@@ -58,8 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**", "/vendor/**");
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
     }
-
 }

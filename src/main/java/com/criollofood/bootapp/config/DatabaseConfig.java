@@ -15,6 +15,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import javax.sql.DataSource;
 import javax.validation.constraints.NotNull;
 import java.sql.SQLException;
+import java.util.Properties;
 
 @Configuration
 @ConfigurationProperties("oracle.criollofood.datasource")
@@ -29,6 +30,10 @@ public class DatabaseConfig {
     private String password;
     @NotNull
     private String driverClassName;
+    @NotNull
+    private String walletLocation;
+    @NotNull
+    private boolean walletConnection;
 
     @Bean(name = "oracleDataSource")
     @Primary
@@ -37,9 +42,20 @@ public class DatabaseConfig {
                                        @Value("${datasource.timeout.connection:30000}") Long timeoutConnection) throws SQLException {
         try {
             OracleDataSource oracleDataSource = new OracleDataSource();
+            Properties props = new Properties();
+
+            props.put("oracle.net.wallet_location",
+                    String.format(
+                            "(source=(method=file)(method_data=(directory=%s)))", walletLocation
+                    )
+            );
+
+            oracleDataSource.setConnectionProperties(props);
+
+            String dbUrl = walletConnection ? String.format("%s?TNS_ADMIN=%s", url, walletLocation) : url;
 
             oracleDataSource.setDriverType(driverClassName);
-            oracleDataSource.setURL(url);
+            oracleDataSource.setURL(dbUrl);
             oracleDataSource.setUser(username);
             oracleDataSource.setPassword(password);
 
@@ -55,13 +71,13 @@ public class DatabaseConfig {
 
             if (dataSourceSingle.equals("true")) {
                 LOGGER.info("Datasource class: SingleConnectionDataSource.class");
-                return new SingleConnectionDataSource(hikariDataSource.getConnection(), true);
+                return new SingleConnectionDataSource(oracleDataSource.getConnection(), true);
             } else {
                 LOGGER.info("Datasource class: HikariDataSource.class");
-                return hikariDataSource;
+                return oracleDataSource;
             }
         } catch (Exception e) {
-            LOGGER.error("Error de conexión a la base de datos.", e);
+            LOGGER.error(String.format("Error de conexión a la base de datos url: %s", url), e);
             throw e;
         }
     }
@@ -80,5 +96,13 @@ public class DatabaseConfig {
 
     public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
+    }
+
+    public void setWalletLocation(String walletLocation) {
+        this.walletLocation = walletLocation;
+    }
+
+    public void setWalletConnection(boolean walletConnection) {
+        this.walletConnection = walletConnection;
     }
 }

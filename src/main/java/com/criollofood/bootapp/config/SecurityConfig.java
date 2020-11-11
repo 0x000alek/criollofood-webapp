@@ -18,5 +18,4 @@ public class SecurityConfig implements WebMvcConfigurer {
     public AuthenticationFacade authenticationFacade() {
         return new AuthenticationFacade();
     }
-
 }

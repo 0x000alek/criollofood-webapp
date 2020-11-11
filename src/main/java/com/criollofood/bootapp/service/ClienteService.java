@@ -1,9 +1,9 @@
 package com.criollofood.bootapp.service;
 
 import com.criollofood.bootapp.domain.Cliente;
-import com.criollofood.bootapp.sql.CreateClienteSP;
-import com.criollofood.bootapp.sql.FindClienteByCorreo;
-import com.criollofood.bootapp.sql.ValidateClienteExistsSP;
+import com.criollofood.bootapp.sql.CrearClienteSP;
+import com.criollofood.bootapp.sql.ObtenerClienteByCorreo;
+import com.criollofood.bootapp.sql.IsClienteExistsSP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,25 +11,25 @@ import org.springframework.stereotype.Service;
 public class ClienteService {
 
     @Autowired
-    private CreateClienteSP createClienteSP;
+    private CrearClienteSP crearClienteSP;
     @Autowired
-    private FindClienteByCorreo findClienteByCorreo;
+    private ObtenerClienteByCorreo obtenerClienteByCorreo;
     @Autowired
-    private ValidateClienteExistsSP validateClienteExistsSP;
+    private IsClienteExistsSP isClienteExistsSP;
 
     public Cliente createCliente(Cliente cliente) {
-        createClienteSP.execute(cliente);
+        crearClienteSP.execute(cliente);
         return findClienteByCorreo(cliente.getCorreo());
     }
 
     public Cliente findClienteByCorreo(String correoCliente) {
-        if (isClienteExists(correoCliente)) {
-            return findClienteByCorreo.execute(correoCliente);
+        if (!isClienteExistsSP.execute(correoCliente)) {
+            return null;
         }
-        return null;
+        return obtenerClienteByCorreo.execute(correoCliente);
     }
 
     public boolean isClienteExists(String correoCliente) {
-        return validateClienteExistsSP.execute(correoCliente);
+        return isClienteExistsSP.execute(correoCliente);
     }
 }

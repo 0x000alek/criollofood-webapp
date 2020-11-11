@@ -47,5 +47,4 @@ public class RepositoryConfig {
     public PlatformTransactionManager transactionManager(@Autowired LocalContainerEntityManagerFactoryBean entityManagerFactoryBean) {
         return new JpaTransactionManager(Objects.requireNonNull(entityManagerFactoryBean.getObject()));
     }
-
 }

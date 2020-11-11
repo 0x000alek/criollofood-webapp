@@ -1,9 +1,9 @@
 package com.criollofood.bootapp.service;
 
 import com.criollofood.bootapp.domain.Reservacion;
-import com.criollofood.bootapp.sql.CreateReservacionSP;
-import com.criollofood.bootapp.sql.DeleteReservacionSP;
-import com.criollofood.bootapp.sql.FindReservacionesByIdCliente;
+import com.criollofood.bootapp.sql.CrearReservacionSP;
+import com.criollofood.bootapp.sql.CancelarReservacionSP;
+import com.criollofood.bootapp.sql.ListarReservacionesByIdCliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,22 +14,21 @@ import java.util.List;
 public class ReservacionService {
 
     @Autowired
-    private CreateReservacionSP createReservacionSP;
+    private CrearReservacionSP crearReservacionSP;
     @Autowired
-    private DeleteReservacionSP deleteReservacionSP;
+    private CancelarReservacionSP cancelarReservacionSP;
     @Autowired
-    private FindReservacionesByIdCliente findReservacionesByIdCliente;
+    private ListarReservacionesByIdCliente listarReservacionesByIdCliente;
 
     public boolean createReservacion(Reservacion reservacion, BigDecimal idCliente) {
-        return createReservacionSP.execute(reservacion, idCliente);
+        return crearReservacionSP.execute(reservacion, idCliente);
     }
 
     public boolean deleteReservacion(BigDecimal idReservacion) {
-        return deleteReservacionSP.execute(idReservacion);
+        return cancelarReservacionSP.execute(idReservacion);
     }
 
     public List<Reservacion> findByIdCliente(BigDecimal idCliente) {
-        return findReservacionesByIdCliente.execute(idCliente);
+        return listarReservacionesByIdCliente.execute(idCliente);
     }
-
 }

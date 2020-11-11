@@ -39,5 +39,4 @@ public class CriolloFoodUserDetailsService implements UserDetailsService {
         return new User(user.getUsername(), user.getPassword(),
                 true, true, true, true, authorities);
     }
-
 }

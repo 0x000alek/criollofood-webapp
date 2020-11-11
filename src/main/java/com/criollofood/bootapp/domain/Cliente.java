@@ -16,7 +16,7 @@ public class Cliente implements Serializable {
     private String correo;
 
     public Cliente() {
-        this.id = BigDecimal.ONE;
+        this.id = BigDecimal.ZERO;
     }
 
     public BigDecimal getId() {

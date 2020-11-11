@@ -117,116 +117,240 @@ END FIND_PERMISOS_BY_ID_GRUPO;
 -- CLIENTES
 
 CREATE OR REPLACE
-PROCEDURE FIND_CLIENTE_BY_CORREO
-(i_correo IN CLIENTES.correo%TYPE,
- o_id OUT CLIENTES.id%TYPE,
- o_nombre OUT CLIENTES.nombre%TYPE,
- o_telefono OUT CLIENTES.telefono%TYPE) AS
+PROCEDURE OBTENER_CLIENTE_BY_CORREO
+(i_correo IN CORE_CLIENTE.CORREO%TYPE,
+ o_id OUT CORE_CLIENTE.id%TYPE,
+ o_nombre OUT CORE_CLIENTE.nombre%TYPE,
+ o_telefono OUT CORE_CLIENTE.telefono%TYPE) AS
 BEGIN
     select
-        id,
-        nombre,
-        telefono
+        ID,
+        NOMBRE,
+        TELEFONO
     into
         o_id,
         o_nombre,
         o_telefono
-    from CLIENTES
-    where correo = i_correo;
-END FIND_CLIENTE_BY_CORREO;
+    from CORE_CLIENTE
+    where CORREO = i_correo;
+END OBTENER_CLIENTE_BY_CORREO;
 
 CREATE OR REPLACE
-PROCEDURE CREATE_CLIENTE
-(i_nombre IN CLIENTES.nombre%TYPE,
- i_telefono IN CLIENTES.telefono%TYPE,
- i_correo IN CLIENTES.correo%TYPE,
+PROCEDURE CREAR_CLIENTE
+(i_nombre IN CORE_CLIENTE.nombre%TYPE,
+ i_telefono IN CORE_CLIENTE.telefono%TYPE,
+ i_correo IN CORE_CLIENTE.correo%TYPE,
  o_sql_code OUT NUMBER) AS
-    v_cliente_id NUMBER;
 BEGIN
-    v_cliente_id := CLIENTES_SEQ.nextval;
+    insert into CORE_CLIENTE (NOMBRE, TELEFONO, CORREO)
+    values (i_nombre, i_telefono, i_correo);
 
-    insert into CLIENTES (ID, NOMBRE, TELEFONO, CORREO) values (v_cliente_id, i_nombre, i_telefono, i_correo);
-
-    o_sql_code := 0;
+    o_sql_code := 1;
 
     commit;
 EXCEPTION
     WHEN OTHERS THEN
-        o_sql_code := 1;
-END CREATE_CLIENTE;
+        o_sql_code := 0;
+END CREAR_CLIENTE;
 
 CREATE OR REPLACE
-PROCEDURE VALIDATE_CLIENTE_EXISTS
-(i_correo IN CLIENTES.correo%TYPE,
+PROCEDURE IS_CLIENTE_EXISTS
+(i_correo IN CORE_CLIENTE.correo%TYPE,
  o_sql_code OUT NUMBER) AS
     v_cliente_id NUMBER;
 BEGIN
-    o_sql_code := 0;
-    select id into v_cliente_id from CLIENTES where correo = i_correo;
+    select ID into v_cliente_id from CORE_CLIENTE where CORREO = i_correo;
+    o_sql_code := 1;
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
-        o_sql_code := 1;
-END VALIDATE_CLIENTE_EXISTS;
+        o_sql_code := 0;
+END IS_CLIENTE_EXISTS;
 
--- RESERVACIOONES
+-- RESERVACIONES
 
 CREATE OR REPLACE
-PROCEDURE CREATE_RESERVACION
-(i_fecha IN RESERVACIONES.FECHA%TYPE,
- i_asistentes IN RESERVACIONES.ASISTENTES%TYPE,
- i_cliente_id IN RESERVACIONES.CLIENTE_ID%TYPE,
+PROCEDURE CREAR_RESERVACION
+(i_fecha IN CORE_RESERVACION.FECHA%TYPE,
+ i_asistentes IN CORE_RESERVACION.ASISTENTES%TYPE,
+ i_cliente_id IN CORE_RESERVACION.CLIENTE_ID%TYPE,
  o_sql_code OUT NUMBER) AS
     v_id NUMBER;
-    v_codigo_reservacion VARCHAR2(10);
+    v_codigo_reservacion VARCHAR2(15);
+    v_fecha_confirmacion TIMESTAMP;
 BEGIN
-    v_id := RESERVACIONES_SEQ.nextval;
-    v_codigo_reservacion := 'RSV-' || LPAD(TO_CHAR(v_id), 6, '0');
+    v_fecha_confirmacion := CURRENT_TIMESTAMP;
 
-    insert into RESERVACIONES (ID, FECHA, ASISTENTES, CODIGO, ESTADO, CLIENTE_ID)
-    values (v_id, i_fecha, i_asistentes, v_codigo_reservacion, 'CONFIRMADA', i_cliente_id);
+    insert into CORE_RESERVACION (FECHA, ASISTENTES, ESTADO, CLIENTE_ID, FECHA_CONFIRMACION)
+    values (i_fecha, i_asistentes, 'CONFIRMADA', i_cliente_id, v_fecha_confirmacion);
 
-    o_sql_code := 0;
+    select ID into v_id from CORE_RESERVACION where FECHA_CONFIRMACION = v_fecha_confirmacion;
+
+    v_codigo_reservacion := 'RSV-' || LPAD(TO_CHAR(v_id), 11, '0');
+
+    update CORE_RESERVACION
+    set CODIGO = v_codigo_reservacion
+    where ID = v_id;
+
+    o_sql_code := 1;
 
     commit;
 EXCEPTION
     WHEN OTHERS THEN
-        o_sql_code := 1;
-END CREATE_RESERVACION;
+        o_sql_code := 0;
+END CREAR_RESERVACION;
 
 CREATE OR REPLACE
-PROCEDURE FIND_RESERVACIONES_BY_ID_CLIENTE
-(i_cliente_id IN RESERVACIONES.CLIENTE_ID%TYPE,
+PROCEDURE LISTAR_RESERVACIONES_BY_ID_CLIENTE
+(i_cliente_id IN CORE_RESERVACION.CLIENTE_ID%TYPE,
  o_reservaciones_cursor OUT SYS_REFCURSOR) AS
 BEGIN
     open o_reservaciones_cursor for
         select
-            id,
-            fecha,
-            asistentes,
-            codigo,
-            estado
-        from RESERVACIONES
-        where cliente_id = i_cliente_id
-        order by fecha desc;
-END FIND_RESERVACIONES_BY_ID_CLIENTE;
+            ID,
+            FECHA,
+            ASISTENTES,
+            CODIGO,
+            ESTADO
+        from CORE_RESERVACION
+        where CLIENTE_ID = i_cliente_id
+        order by FECHA desc;
+END LISTAR_RESERVACIONES_BY_ID_CLIENTE;
 
 CREATE OR REPLACE
-PROCEDURE DELETE_RESERVACION
-(i_id IN RESERVACIONES.ID%TYPE,
+PROCEDURE CANCELAR_RESERVACION
+(i_id IN CORE_RESERVACION.ID%TYPE,
  o_sql_code OUT NUMBER) AS
 BEGIN
 
-    update RESERVACIONES
-        set estado = 'CANCELADA'
-    where id = i_id;
+    update CORE_RESERVACION
+    set ESTADO = 'CANCELADA'
+    where ID = i_id;
 
-    o_sql_code := 0;
+    o_sql_code := 1;
 
     commit;
 EXCEPTION
     WHEN OTHERS THEN
-        o_sql_code := 1;
-END DELETE_RESERVACION;
+        o_sql_code := 0;
+END CANCELAR_RESERVACION;
+
+-- RECETAS
+
+CREATE OR REPLACE
+PROCEDURE LISTAR_RECETAS_DISPONIBLES
+(o_recetas_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_recetas_cursor for
+        select * from PRODUCTOS_RECETA where ESTA_DISPONIBLE = 1;
+END LISTAR_RECETAS_DISPONIBLES;
+
+-- ATENCION
+
+CREATE OR REPLACE
+PROCEDURE CREAR_ATENCION
+(i_cliente_id IN CORE_CLIENTE.ID%TYPE,
+ i_mesa_id IN CORE_MESA.NUMERO_MESA%TYPE,
+ o_atencion_id OUT ATENCION_ATENCION.ID%TYPE,
+ o_sql_code OUT NUMBER) AS
+    v_id_atencion NUMBER(11);
+    v_fecha TIMESTAMP;
+    v_codigo VARCHAR(150);
+BEGIN
+    v_fecha := CURRENT_TIMESTAMP;
+
+    insert into ATENCION_ATENCION (FECHA, ESTA_ACTIVO, ESTA_PAGADA, CLIENTE_ID, NUMERO_MESA)
+    values (v_fecha, 1, 0, i_cliente_id, i_mesa_id);
+
+    select ID into v_id_atencion FROM ATENCION_ATENCION where FECHA = v_fecha;
+
+    v_codigo := 'ATN-' || LPAD(TO_CHAR(v_id_atencion), 11, '0');
+
+    update ATENCION_ATENCION
+        set CODIGO = v_codigo
+    where FECHA = v_fecha;
+
+    o_atencion_id := v_id_atencion;
+    o_sql_code := 1;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 0;
+END CREAR_ATENCION;
+
+CREATE OR REPLACE
+PROCEDURE OBTENER_ATENCION_ACTIVA_CLIENTE
+(i_cliente_id IN CORE_CLIENTE.ID%TYPE,
+ o_id OUT ATENCION_ATENCION.ID%TYPE,
+ o_numero_mesa OUT ATENCION_ATENCION.NUMERO_MESA%TYPE,
+ o_sql_code OUT NUMBER) AS
+BEGIN
+    select
+        ID, NUMERO_MESA
+    into
+        o_id, o_numero_mesa
+    from ATENCION_ATENCION
+    where CLIENTE_ID = i_cliente_id;
+    o_sql_code := 1;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 0;
+END OBTENER_ATENCION_ACTIVA_CLIENTE;
+
+-- PEDIDO
+
+CREATE OR REPLACE
+PROCEDURE CREAR_PEDIDO
+(i_atencion_id IN ATENCION_ATENCION.ID%TYPE,
+ o_pedido_id OUT ATENCION_PEDIDO.ID%TYPE,
+ o_sql_code OUT NUMBER) AS
+    v_fecha_ingreso TIMESTAMP;
+    v_pedido_id NUMBER(11);
+BEGIN
+    v_fecha_ingreso := CURRENT_TIMESTAMP;
+
+    insert into ATENCION_PEDIDO (ESTADO, FECHA_INGRESO, ATENCION_ID)
+    values ('INGRESADO', v_fecha_ingreso, i_atencion_id);
+
+    select ID into v_pedido_id from ATENCION_PEDIDO where FECHA_INGRESO = v_fecha_ingreso;
+
+    o_pedido_id := v_pedido_id;
+    o_sql_code := 1;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 0;
+END CREAR_PEDIDO;
+
+CREATE OR REPLACE
+PROCEDURE AGREGAR_AL_PEDIDO
+(i_pedido_id IN ATENCION_PEDIDO.ID%TYPE,
+ i_receta_id IN PRODUCTOS_RECETA.ID%TYPE,
+ i_cantidad IN NUMBER,
+ o_sql_code OUT NUMBER) AS
+BEGIN
+    insert into ATENCION_PEDIDO_RECETA (PEDIDO_ID, RECETA_ID, CANTIDAD)
+    values (i_pedido_id, i_receta_id, i_cantidad);
+
+    o_sql_code := 1;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 0;
+END AGREGAR_AL_PEDIDO;
+
+CREATE OR REPLACE
+PROCEDURE LISTAR_PEDIDOS_PENDIENTES
+(o_pedidos_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_pedidos_cursor for
+        select
+               t1.PEDIDO_ID as PEDIDO_ID,
+               t1.RECETA_ID as RECETA_ID,
+               t2.NOMBRE as NOMBRE_RECETA,
+               t1.CANTIDAD as CANTIDAD_RECETA
+        from ATENCION_PEDIDO t0 join ATENCION_PEDIDO_RECETA t1
+        on t0.ID = t1.PEDIDO_ID
+        join PRODUCTOS_RECETA t2
+        on t1.RECETA_ID = t2.ID
+        where t0.ESTADO <> 'DESPACHADO';
+END LISTAR_PEDIDOS_PENDIENTES;
 
 
 COMMIT;

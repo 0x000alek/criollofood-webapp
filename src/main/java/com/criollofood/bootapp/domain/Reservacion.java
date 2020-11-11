@@ -17,8 +17,8 @@ public class Reservacion implements Serializable {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     @NotNull(message = "*Porfavor ingresa una fecha")
     private Date fecha;
-    @Min(value = 1, message = "*El mínimo permitido es de 1 asistente")
-    @Max(value = 20, message = "*El máximo permitido es de 20 asistentes")
+    @Min(value = 1, message = "*El mínimo permitido es de 1 persona")
+    @Max(value = 20, message = "*El máximo permitido es de 20 personas")
     private int asistentes;
     private String codigo;
     private String estado;
