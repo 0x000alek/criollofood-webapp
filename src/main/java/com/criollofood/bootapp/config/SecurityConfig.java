@@ -1,5 +1,6 @@
 package com.criollofood.bootapp.config;
 
+import com.criollofood.bootapp.utils.AESEncrypter;
 import com.criollofood.bootapp.utils.AuthenticationFacade;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,5 +18,10 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public AuthenticationFacade authenticationFacade() {
         return new AuthenticationFacade();
+    }
+
+    @Bean
+    public AESEncrypter aesEncrypter() {
+        return new AESEncrypter();
     }
 }
