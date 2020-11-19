@@ -23,11 +23,12 @@ public class CrearClienteSP extends StoredProcedure {
         declareParameter(new SqlParameter("i_nombre", OracleTypes.VARCHAR));
         declareParameter(new SqlParameter("i_telefono", OracleTypes.INTEGER));
         declareParameter(new SqlParameter("i_correo", OracleTypes.VARCHAR));
+        declareParameter(new SqlOutParameter("o_id", OracleTypes.NUMBER));
         declareParameter(new SqlOutParameter("o_sql_code", OracleTypes.NUMBER));
         compile();
     }
 
-    public boolean execute(Cliente cliente) {
+    public Cliente execute(Cliente cliente) {
         Map<String, Object> parametersMap = new HashMap<>(Collections.emptyMap());
 
         parametersMap.put("i_nombre", cliente.getNombre());
@@ -37,7 +38,13 @@ public class CrearClienteSP extends StoredProcedure {
         Map<String, Object> resultMap = super.execute(parametersMap);
         BigDecimal resultSqlCode = (BigDecimal) resultMap.get("o_sql_code");
 
-        return resultSqlCode.compareTo(BigDecimal.ONE) == 0;
+        if (resultSqlCode.compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
+
+        cliente.setId((BigDecimal) resultMap.get("o_id"));
+
+        return cliente;
     }
 
 }

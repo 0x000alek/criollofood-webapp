@@ -26,11 +26,17 @@ public class ObtenerClienteByCorreo extends StoredProcedure {
         declareParameter(new SqlOutParameter("o_id", OracleTypes.NUMBER));
         declareParameter(new SqlOutParameter("o_nombre", OracleTypes.VARCHAR));
         declareParameter(new SqlOutParameter("o_telefono", OracleTypes.INTEGER));
+        declareParameter(new SqlOutParameter("o_sql_code", OracleTypes.NUMBER));
         compile();
     }
 
     public Cliente execute(String corrreoCliente) {
         Map<String, Object> resultMap = super.execute(Collections.singletonMap("i_correo", corrreoCliente));
+        BigDecimal resultSqlCode = (BigDecimal) resultMap.get("o_sql_code");
+
+        if (resultSqlCode.compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
 
         Cliente cliente = new Cliente();
 

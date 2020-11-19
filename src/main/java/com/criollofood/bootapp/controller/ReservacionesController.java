@@ -16,7 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.Objects;
 
 @Controller
 public class ReservacionesController {
@@ -59,13 +58,11 @@ public class ReservacionesController {
         } else {
             String correoCliente = cliente.getCorreo();
             authenticationFacade.authWithoutPassword(correoCliente);
-            cliente = clienteService.isClienteExists(correoCliente) ?
-                    clienteService.findClienteByCorreo(correoCliente) : new Cliente();
+            cliente = clienteService.findByCorreoOrDefault(correoCliente, new Cliente());
             cliente.setCorreo(correoCliente);
             session.setAttribute("cliente", cliente);
             session.setAttribute("atencion", atencionService.obtenerAtencionByIdCliente(cliente.getId()));
             session.setAttribute("pedid", null);
-            //session.setAttribute("atencion", new Atencion());
             session.setAttribute("detallePedido", new DetallePedido());
 
             return new ModelAndView("redirect:/reservaciones");
@@ -120,12 +117,12 @@ public class ReservacionesController {
     }
 
     private Cliente addCliente(Reservacion reservacion, String correoCliente) {
-        Cliente newCliente = new Cliente();
+        Cliente cliente = new Cliente();
 
-        newCliente.setNombre(reservacion.getNombreCliente());
-        newCliente.setTelefono(reservacion.getTelefonoCliente());
-        newCliente.setCorreo(correoCliente);
+        cliente.setNombre(reservacion.getNombreCliente());
+        cliente.setTelefono(reservacion.getTelefonoCliente());
+        cliente.setCorreo(correoCliente);
 
-        return clienteService.createCliente(newCliente);
+        return clienteService.add(cliente);
     }
 }
