@@ -1,6 +1,7 @@
 package com.criollofood.bootapp.sql;
 
-import com.criollofood.bootapp.domain.ItemPedido;
+import com.criollofood.bootapp.domain.Pedido;
+import com.criollofood.bootapp.domain.PedidoCocina;
 import oracle.jdbc.OracleTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -21,12 +22,12 @@ public class ListarPedidosPendientesSP extends StoredProcedure {
 
         declareParameter(
                 new SqlOutParameter("o_pedidos_cursor", OracleTypes.CURSOR,
-                        BeanPropertyRowMapper.newInstance(ItemPedido.class)));
+                        BeanPropertyRowMapper.newInstance(PedidoCocina.class)));
         compile();
     }
 
-    public List<ItemPedido> execute() {
+    public List<PedidoCocina> execute() {
         Map<String, Object> resultMap = super.execute(Collections.emptyMap());
-        return (List<ItemPedido>) resultMap.get("o_pedidos_cursor");
+        return (List<PedidoCocina>) resultMap.get("o_pedidos_cursor");
     }
 }

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <div th:replace="fragments/header :: header"></div>
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar ('cocina')"></div>
+<div class="px-5">
+    <div class="row">
+        <h2 class="mx-auto pt-3 m-0">COCINA</h2>
+    </div>
+    <hr class="border">
+    <div class="alert alert-primary font-weight-bold mb-0" role="alert">
+        Pedidos: <span th:text="${pedidos.size()}"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-12 pb-3 pt-3" style="overflow-x: auto">
+            <div class="card-deck" style="width: max-content">
+
+                <div class="card" style="width: 22rem; border-width: unset;"
+                    th:each="pedido : ${pedidos}"
+                    th:classappend="${pedido.atrasado} ? 'rounded border-danger'  : 'border-0'">
+
+                    <img class="card-img-top" style="max-height: 214px;"
+                         th:src="@{/images/{imagen}(imagen=${pedido.imagen})}"
+                         th:data-nombre="${pedido.nombreReceta}"
+                         th:data-ingredientes="${pedido.ingredientes}"
+                         th:onclick="openModal(this.getAttribute('data-nombre'), this.getAttribute('data-ingredientes'))">
+
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${pedido.nombreReceta}"></h5>
+                        <p class="card-text" th:text="${pedido.comentario}"></p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="mb-0 font-italic font-weight-bold">Mesa N°<span th:text="${pedido.numeroMesa}"></span></p>
+                        <p class="mb-0 font-italic">Hace <span th:text="${pedido.tiempo}"></span> mín</p>
+                        <p class="font-italic">Garzon: <span class="text-right" th:text="${pedido.garzon}"></span></p>
+                        <form action="#" th:action="@{'/cocina/pedido/'+${pedido.pedidoRecetaId}+'/cambiar-estado'}" method="POST">
+<!--                            <div class="form-group mb-1">-->
+<!--                                <div class="input-group">-->
+<!--                                    <input type="hidden" class="form-control" th:value="${pedido.pedidoId}" th:name="pedidoId"/>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <button type="submit" href="#" name="estado" value="CANCELADO" class="btn btn-outline-danger btn-sm">CANCELAR</button>
+                            <button type="submit" href="#" name="estado" value="PREPARADO" class="btn btn-primary btn-sm float-right">TERMINADO</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <hr class="border">
+<!--    <div class="alert alert-secondary" role="alert">-->
+<!--        Quedan <span th:text="${recetas.size()}"></span> pedidos en cola-->
+<!--    </div>-->
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalIngredientes" tabindex="-1" role="dialog" aria-labelledby="modalIngredientesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalIngredientesLabel">Ingredientes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-nombre"></h3>
+                <ul class="modal-ingredientes"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:insert="fragments/common-scripts :: common-scripts"></div>
+</body>
+<script>
+function openModal(nombre, ingredientes) {
+    var lista = ingredientes ? ingredientes?.split(";") : [];
+
+    $('#modalIngredientes').modal('toggle');
+
+    $('.modal-nombre').text(nombre);
+
+    if (lista.length) {
+        lista.forEach((ingrediente) => {
+            $('.modal-ingredientes').append($(`<li>${ingrediente}</li>`))
+        });
+    } else {
+        $('.modal-ingredientes').text('Receta no disponible');
+    }
+
+    $('#modalIngredientes').on('hidden.bs.modal', function() {
+        $('.modal-ingredientes').text('');
+    });
+}
+</script>
+</html>

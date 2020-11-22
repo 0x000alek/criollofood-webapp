@@ -9,13 +9,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class PedidoController {
@@ -112,10 +112,10 @@ public class PedidoController {
         return new ModelAndView("redirect:/pedido");
     }
 
-    public ModelAndView pedidosPendientes() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("");
-
-        return modelAndView;
+    @RequestMapping(value = "/pedidos-pendientes", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public List<PedidoCocina> pedidosPendientes() {
+        List<PedidoCocina> pedidosPendientes = pedidoService.listarPedidosPendientes();
+        return pedidosPendientes;
     }
 }

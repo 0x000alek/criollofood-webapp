@@ -34,6 +34,18 @@
     background-size: cover;
 }
 
+.jumbotron-image-cocina {
+    background-image: url("../images/carousel/cocina.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.pedido-atrasado {
+    border: #FF1C19 4px solid;
+    border-radius: 6px;
+}
+
 .brand {
     position: absolute;
     left: 50%;
