@@ -17,7 +17,6 @@ import java.util.HashSet;
 
 @Component
 public class LoginPageFilter extends GenericFilterBean {
-
     private final AuthenticationFacade authenticationFacade;
 
     public LoginPageFilter(@Autowired AuthenticationFacade authenticationFacade) {
@@ -40,5 +39,4 @@ public class LoginPageFilter extends GenericFilterBean {
 
         filterChain.doFilter(servletRequest, servletResponse);
     }
-
 }

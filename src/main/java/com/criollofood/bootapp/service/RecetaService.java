@@ -16,5 +16,4 @@ public class RecetaService {
     public List<Receta> findAllDisponibles() {
         return  listarRecetasDisponibles.execute();
     }
-
 }

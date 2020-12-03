@@ -10,16 +10,12 @@ public class Usuario implements Serializable {
     private static final long serialVersionUID = 3731733605737805482L;
 
     private BigDecimal id;
-    @NotEmpty(message = "*Porfavor ingresa un nombre de usuario")
+    @NotEmpty
     private String username;
-    @NotEmpty(message = "*Porfavor ingresa una contraseña")
+    @NotEmpty
     private String password;
-    @NotEmpty(message = "*Porfavor ingresa tu nombre")
     private String firstName;
-    @NotEmpty(message = "*Porfavor ingresa tu apellido")
     private String lastName;
-    @NotEmpty(message = "*Porfavor ingresa tu email")
-    @Email(message = "*Porfavor ingresa un email válido")
     private String email;
 
     private List<Grupo> grupos;

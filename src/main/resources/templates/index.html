@@ -1,67 +1,14 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
+      xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <div th:replace="fragments/header :: header"></div>
 </head>
 <body>
-<div th:replace="fragments/navbar :: navbar ('home')"></div>
-<div class="jumbotron jumbotron-image text-center">
-    <h1 class="display-4 text-white">Reserva Online! Sin filas ni listas de espera</h1>
-    <hr class="my-4">
-    <a class="btn btn-outline-light btn-lg" th:href="@{/reservar}" role="button">RESERVA TU MESA</a>
-</div>
+<div th:replace="fragments/navbar :: navbar"></div>
 <div class="container">
-    <div class="row">
-        <h2 class="mx-auto p-4">NUESTRA CARTA</h2>
-    </div>
-    <hr class="border">
-    <div class="row">
-        <div class="col-sm-4 pb-3" th:each="receta : ${recetas}">
-            <div class="card mx-auto" style="width: 22rem;">
-                <img class="card-img-top" th:src="@{/images/{imagen}(imagen=${receta.imagen})}" style="max-height: 214px;">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${receta.nombre}"></h5>
-                    <p class="card-text" th:text="${receta.descripcion}"></p>
-                    <p class="card-text text-right" th:text="${#strings.replace(#strings.replace(#numbers.formatCurrency(receta.precio), '.00', ''), ',', '.')}"></p>
-                    <form action="#" th:action="@{/pedido/agregar}" method="POST" th:if="${atencion != null}">
-                        <div class="form-group mb-1">
-                            <div class="input-group">
-                                <input type="hidden" class="form-control" th:value="${receta.id}" th:name="receta-id"/>
-                            </div>
-                        </div>
-                        <div class="form-group mb-1">
-                            <div class="input-group">
-                                <input type="hidden" class="form-control" th:value="${receta.nombre}" th:name="receta-nombre"/>
-                            </div>
-                        </div>
-                        <div class="form-group mb-1">
-                            <div class="input-group">
-                                <input type="hidden" class="form-control" th:value="${receta.precio}" th:name="receta-precio"/>
-                            </div>
-                        </div>
-                        <div class="form-row align-items-center border">
-                            <div class="col-sm-5 my-1">
-                                <div class="input-group">
-                                    <div class="def-number-input number-input safari_only">
-                                        <button type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" class="minus"></button>
-                                        <input class="quantity" min="1" name="quantity" value="1" type="number" th:name="receta-cantidad" readonly>
-                                        <button type="button" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" class="plus"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-7 my-1">
-                                <button type="submit" href="#" class="btn btn-primary btn-sm float-right">AGREGAR AL PEDIDO</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <h2>ADMIN</h2>
 </div>
-
 <div th:insert="fragments/common-scripts :: common-scripts"></div>
 </body>
 </html>

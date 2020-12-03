@@ -1,78 +1,81 @@
 -- USUARIOS
 
 CREATE OR REPLACE
-PROCEDURE FIND_ALL_USUARIOS
-(o_usuarios_cursor OUT SYS_REFCURSOR) AS
-BEGIN
-    open o_usuarios_cursor for
-        select * from USUARIOS;
-END FIND_ALL_USUARIOS;
-
-CREATE OR REPLACE
-PROCEDURE FIND_USUARIO_BY_USERNAME
-(i_username IN USUARIOS.username%TYPE,
- o_user_id OUT USUARIOS.id%TYPE,
- o_password OUT USUARIOS.password%TYPE,
- o_first_name OUT USUARIOS.first_name%TYPE,
- o_last_name OUT USUARIOS.last_name%TYPE,
- o_email OUT USUARIOS.email%TYPE) AS
+PROCEDURE OBTENER_USUARIO_BY_USERNAME
+(i_username IN CORE_USER.USERNAME%TYPE,
+ o_user_id OUT CORE_USER.ID%TYPE,
+ o_password OUT CORE_USER.PASSWORD%TYPE,
+ o_first_name OUT CORE_USER.FIRST_NAME%TYPE,
+ o_last_name OUT CORE_USER.LAST_NAME%TYPE,
+ o_email OUT CORE_USER.EMAIL%TYPE,
+ o_sql_code OUT NUMBER) AS
 BEGIN
     select
-        id,
-        password,
-        first_name,
-        last_name,
-        email
+        ID,
+        PASSWORD,
+        FIRST_NAME,
+        LAST_NAME,
+        EMAIL
     into
         o_user_id,
         o_password,
         o_first_name,
         o_last_name,
         o_email
-    from USUARIOS
-    where username = i_username;
-END FIND_USUARIO_BY_USERNAME;
+    from CORE_USER
+    where USERNAME = i_username;
+
+    o_sql_code := 1;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 0;
+END OBTENER_USUARIO_BY_USERNAME;
 
 CREATE OR REPLACE
-PROCEDURE CREATE_USUARIO
-(i_username IN USUARIOS.username%TYPE,
- i_password IN USUARIOS.password%TYPE,
- i_first_name IN USUARIOS.first_name%TYPE,
- i_last_name IN USUARIOS.last_name%TYPE,
- i_email IN USUARIOS.email%TYPE,
- i_is_superuser IN USUARIOS.is_superuser%TYPE,
- i_is_staff IN USUARIOS.is_staff%TYPE,
- i_grupo_id IN GRUPOS.ID%TYPE,
+PROCEDURE CREAR_USUARIO
+(i_username IN CORE_USER.USERNAME%TYPE,
+ i_password IN CORE_USER.PASSWORD%TYPE,
+ i_first_name IN CORE_USER.FIRST_NAME%TYPE,
+ i_last_name IN CORE_USER.LAST_NAME%TYPE,
+ i_email IN CORE_USER.EMAIL%TYPE,
+ i_is_superuser IN CORE_USER.IS_SUPERUSER%TYPE,
+ i_is_staff IN CORE_USER.IS_STAFF%TYPE,
+ i_grupo_id IN AUTH_GROUP.ID%TYPE,
  o_sql_code OUT NUMBER) AS
+    v_date_joined TIMESTAMP;
     v_usuario_id NUMBER;
 BEGIN
-    v_usuario_id := USUARIOS_SEQ.nextval;
+    v_date_joined := CURRENT_TIMESTAMP;
 
-    insert into USUARIOS (ID, PASSWORD, LAST_LOGIN, IS_SUPERUSER, USERNAME, FIRST_NAME, LAST_NAME, EMAIL, IS_STAFF, IS_ACTIVE, DATE_JOINED)
-    values (v_usuario_id, i_password, CURRENT_TIMESTAMP, i_is_superuser, i_username, i_first_name, i_last_name, i_email, i_is_staff, 1, CURRENT_TIMESTAMP);
+    insert into CORE_USER (ID, PASSWORD, LAST_LOGIN, IS_SUPERUSER, USERNAME, FIRST_NAME, LAST_NAME, EMAIL, IS_STAFF, IS_ACTIVE, DATE_JOINED)
+    values (v_usuario_id, i_password, CURRENT_TIMESTAMP, i_is_superuser, i_username, i_first_name, i_last_name, i_email, i_is_staff, 1, v_date_joined);
 
-    insert into USUARIO_GRUPO (USUARIOS_ID, GRUPOS_ID) values (v_usuario_id, i_grupo_id);
+    select ID into v_usuario_id from CORE_USER where DATE_JOINED = v_date_joined;
 
-    o_sql_code := 0;
+    insert into CORE_USER_GROUPS (USER_ID, GROUP_ID) values (v_usuario_id, i_grupo_id);
+
+    o_sql_code := 1;
 
     commit;
 EXCEPTION
     WHEN OTHERS THEN
-        o_sql_code := 1;
-END CREATE_USUARIO;
+        o_sql_code := 0;
+END CREAR_USUARIO;
 
 CREATE OR REPLACE
-PROCEDURE VALIDATE_USUARIO_EXISTS
-(i_username IN USUARIOS.username%TYPE,
+PROCEDURE LOGIN_USUARIO
+(i_usuario_id IN CORE_USER.ID%TYPE,
  o_sql_code OUT NUMBER) AS
-    v_user_id NUMBER;
 BEGIN
-    o_sql_code := 0;
-    select id into v_user_id from USUARIOS where username = i_username;
+    update CORE_USER
+        set LAST_LOGIN = CURRENT_TIMESTAMP
+    where ID = i_usuario_id;
+
+    o_sql_code := 1;
 EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        o_sql_code := 1;
-END VALIDATE_USUARIO_EXISTS;
+    WHEN OTHERS THEN
+        o_sql_code := 0;
+END LOGIN_USUARIO;
 
 -- GRUPOS
 
@@ -85,18 +88,18 @@ BEGIN
 END FIND_ALL_GRUPOS;
 
 CREATE OR REPLACE
-PROCEDURE FIND_GRUPOS_BY_ID_USUARIO
-(i_usuario_id IN USUARIOS.ID%TYPE,
+PROCEDURE LISTAR_GRUPOS_BY_ID_USUARIO
+(i_usuario_id IN CORE_USER.ID%TYPE,
  o_grupos_cursor OUT SYS_REFCURSOR) AS
 BEGIN
     open o_grupos_cursor for
         select
             grupos.ID   as id,
             grupos.NAME as name
-        from USUARIO_GRUPO usrgrp
-                 join GRUPOS grupos on usrgrp.GRUPOS_ID = grupos.ID
-        where usrgrp.USUARIOS_ID = i_usuario_id;
-END FIND_GRUPOS_BY_ID_USUARIO;
+        from CORE_USER_GROUPS usrgrp join AUTH_GROUP grupos
+        on usrgrp.GROUP_ID = grupos.ID
+        where usrgrp.USER_ID = i_usuario_id;
+END LISTAR_GRUPOS_BY_ID_USUARIO;
 
 -- PERMISOS
 
@@ -119,9 +122,10 @@ END FIND_PERMISOS_BY_ID_GRUPO;
 CREATE OR REPLACE
 PROCEDURE OBTENER_CLIENTE_BY_CORREO
 (i_correo IN CORE_CLIENTE.CORREO%TYPE,
- o_id OUT CORE_CLIENTE.id%TYPE,
- o_nombre OUT CORE_CLIENTE.nombre%TYPE,
- o_telefono OUT CORE_CLIENTE.telefono%TYPE) AS
+ o_id OUT CORE_CLIENTE.ID%TYPE,
+ o_nombre OUT CORE_CLIENTE.NOMBRE%TYPE,
+ o_telefono OUT CORE_CLIENTE.TELEFONO%TYPE,
+ o_sql_code OUT NUMBER) AS
 BEGIN
     select
         ID,
@@ -133,17 +137,27 @@ BEGIN
         o_telefono
     from CORE_CLIENTE
     where CORREO = i_correo;
+
+    o_sql_code := 1;
+EXCEPTION
+    WHEN OTHERS THEN
+        o_sql_code := 0;
 END OBTENER_CLIENTE_BY_CORREO;
 
 CREATE OR REPLACE
 PROCEDURE CREAR_CLIENTE
-(i_nombre IN CORE_CLIENTE.nombre%TYPE,
- i_telefono IN CORE_CLIENTE.telefono%TYPE,
- i_correo IN CORE_CLIENTE.correo%TYPE,
+(i_nombre IN CORE_CLIENTE.NOMBRE%TYPE,
+ i_telefono IN CORE_CLIENTE.TELEFONO%TYPE,
+ i_correo IN CORE_CLIENTE.CORREO%TYPE,
+ o_id OUT CORE_CLIENTE.ID%TYPE,
  o_sql_code OUT NUMBER) AS
 BEGIN
     insert into CORE_CLIENTE (NOMBRE, TELEFONO, CORREO)
     values (i_nombre, i_telefono, i_correo);
+
+    select ID into o_id
+    from CORE_CLIENTE
+    where CORREO = i_correo;
 
     o_sql_code := 1;
 
@@ -152,19 +166,6 @@ EXCEPTION
     WHEN OTHERS THEN
         o_sql_code := 0;
 END CREAR_CLIENTE;
-
-CREATE OR REPLACE
-PROCEDURE IS_CLIENTE_EXISTS
-(i_correo IN CORE_CLIENTE.correo%TYPE,
- o_sql_code OUT NUMBER) AS
-    v_cliente_id NUMBER;
-BEGIN
-    select ID into v_cliente_id from CORE_CLIENTE where CORREO = i_correo;
-    o_sql_code := 1;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        o_sql_code := 0;
-END IS_CLIENTE_EXISTS;
 
 -- RESERVACIONES
 
@@ -200,6 +201,42 @@ EXCEPTION
 END CREAR_RESERVACION;
 
 CREATE OR REPLACE
+PROCEDURE LISTAR_RESERVACIONES
+(o_reservaciones_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_reservaciones_cursor for
+        select
+            reserv.ID AS ID,
+            reserv.FECHA AS FECHA,
+            reserv.ASISTENTES AS ASISTENTES,
+            reserv.CODIGO AS CODIGO,
+            reserv.ESTADO AS ESTADO,
+            cliente.NOMBRE AS NOMBRE_CLIENTE
+        from CORE_RESERVACION reserv join CORE_CLIENTE cliente
+        on reserv.CLIENTE_ID = cliente.ID
+        order by ID;
+END LISTAR_RESERVACIONES;
+
+CREATE OR REPLACE
+PROCEDURE LISTAR_RESERVACIONES_BY_FECHA
+(i_fecha IN CORE_RESERVACION.FECHA%TYPE,
+ o_reservaciones_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_reservaciones_cursor for
+        select
+            reserv.ID AS ID,
+            reserv.FECHA AS FECHA,
+            reserv.ASISTENTES AS ASISTENTES,
+            reserv.CODIGO AS CODIGO,
+            reserv.ESTADO AS ESTADO,
+            cliente.NOMBRE AS NOMBRE_CLIENTE
+        from CORE_RESERVACION reserv join CORE_CLIENTE cliente
+        on reserv.CLIENTE_ID = cliente.ID
+        where trunc(FECHA, 'DDD') = trunc(i_fecha, 'DDD')
+        order by ID;
+END LISTAR_RESERVACIONES_BY_FECHA;
+
+CREATE OR REPLACE
 PROCEDURE LISTAR_RESERVACIONES_BY_ID_CLIENTE
 (i_cliente_id IN CORE_RESERVACION.CLIENTE_ID%TYPE,
  o_reservaciones_cursor OUT SYS_REFCURSOR) AS
@@ -217,13 +254,14 @@ BEGIN
 END LISTAR_RESERVACIONES_BY_ID_CLIENTE;
 
 CREATE OR REPLACE
-PROCEDURE CANCELAR_RESERVACION
+PROCEDURE CAMBIAR_ESTADO_RESERVACION
 (i_id IN CORE_RESERVACION.ID%TYPE,
+ i_estado IN CORE_RESERVACION.ESTADO%TYPE,
  o_sql_code OUT NUMBER) AS
 BEGIN
 
     update CORE_RESERVACION
-    set ESTADO = 'CANCELADA'
+    set ESTADO = i_estado
     where ID = i_id;
 
     o_sql_code := 1;
@@ -232,7 +270,7 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         o_sql_code := 0;
-END CANCELAR_RESERVACION;
+END CAMBIAR_ESTADO_RESERVACION;
 
 -- RECETAS
 
@@ -248,18 +286,21 @@ END LISTAR_RECETAS_DISPONIBLES;
 
 CREATE OR REPLACE
 PROCEDURE CREAR_ATENCION
-(i_cliente_id IN CORE_CLIENTE.ID%TYPE,
+(i_reservacion_id IN CORE_CLIENTE.ID%TYPE,
  i_mesa_id IN CORE_MESA.NUMERO_MESA%TYPE,
  o_atencion_id OUT ATENCION_ATENCION.ID%TYPE,
  o_sql_code OUT NUMBER) AS
+    v_cliente_id NUMBER(11);
     v_id_atencion NUMBER(11);
     v_fecha TIMESTAMP;
     v_codigo VARCHAR(150);
 BEGIN
     v_fecha := CURRENT_TIMESTAMP;
 
+    select CLIENTE_ID into v_cliente_id from CORE_RESERVACION where ID = i_reservacion_id;
+
     insert into ATENCION_ATENCION (FECHA, ESTA_ACTIVO, ESTA_PAGADA, CLIENTE_ID, NUMERO_MESA)
-    values (v_fecha, 1, 0, i_cliente_id, i_mesa_id);
+    values (v_fecha, 1, 0, v_cliente_id, i_mesa_id);
 
     select ID into v_id_atencion FROM ATENCION_ATENCION where FECHA = v_fecha;
 
@@ -269,6 +310,14 @@ BEGIN
         set CODIGO = v_codigo
     where FECHA = v_fecha;
 
+    update CORE_MESA
+        set EN_USO = 1
+    where NUMERO_MESA = i_mesa_id;
+
+    update CORE_RESERVACION
+        set ESTADO = 'TOMADA'
+    where ID = i_reservacion_id;
+
     o_atencion_id := v_id_atencion;
     o_sql_code := 1;
 EXCEPTION
@@ -277,7 +326,7 @@ EXCEPTION
 END CREAR_ATENCION;
 
 CREATE OR REPLACE
-PROCEDURE OBTENER_ATENCION_ACTIVA_CLIENTE
+PROCEDURE OBTENER_ATENCION_BY_ID_CLIENTE
 (i_cliente_id IN CORE_CLIENTE.ID%TYPE,
  o_id OUT ATENCION_ATENCION.ID%TYPE,
  o_numero_mesa OUT ATENCION_ATENCION.NUMERO_MESA%TYPE,
@@ -289,11 +338,12 @@ BEGIN
         o_id, o_numero_mesa
     from ATENCION_ATENCION
     where CLIENTE_ID = i_cliente_id;
+
     o_sql_code := 1;
 EXCEPTION
     WHEN OTHERS THEN
         o_sql_code := 0;
-END OBTENER_ATENCION_ACTIVA_CLIENTE;
+END OBTENER_ATENCION_BY_ID_CLIENTE;
 
 -- PEDIDO
 
@@ -351,6 +401,26 @@ BEGIN
         on t1.RECETA_ID = t2.ID
         where t0.ESTADO <> 'DESPACHADO';
 END LISTAR_PEDIDOS_PENDIENTES;
+
+-- CATEGORIA
+
+CREATE OR REPLACE
+PROCEDURE LISTAR_CATEGORIAS
+(o_categorias_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_categorias_cursor for
+        select * from PRODUCTOS_CATEGORIA;
+END LISTAR_CATEGORIAS;
+
+-- MESA
+
+CREATE OR REPLACE
+PROCEDURE LISTAR_MESAS
+(o_mesas_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+    open o_mesas_cursor for
+        select * from CORE_MESA;
+END LISTAR_MESAS;
 
 
 COMMIT;

@@ -36,7 +36,7 @@ public class CriolloFoodUserDetailsService implements UserDetailsService {
     }
 
     private UserDetails buildUserForAuthentication(Usuario user, List<GrantedAuthority> authorities) {
-        return new User(user.getUsername(), user.getPassword(),
+        return new User(user.getEmail(), user.getPassword(),
                 true, true, true, true, authorities);
     }
 }

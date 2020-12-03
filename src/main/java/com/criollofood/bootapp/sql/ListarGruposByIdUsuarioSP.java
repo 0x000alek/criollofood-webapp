@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class FindGruposByIdUsuarioSP extends StoredProcedure {
+public class ListarGruposByIdUsuarioSP extends StoredProcedure {
 
-    public FindGruposByIdUsuarioSP(@Autowired DataSource dataSource) {
-        super(dataSource, "FIND_GRUPOS_BY_ID_USUARIO");
+    public ListarGruposByIdUsuarioSP(@Autowired DataSource dataSource) {
+        super(dataSource, "LISTAR_GRUPOS_BY_ID_USUARIO");
 
         declareParameter(new SqlParameter("i_usuario_id", OracleTypes.NUMBER));
         declareParameter(

@@ -1,9 +1,7 @@
 package com.criollofood.bootapp.sql;
 
 import com.criollofood.bootapp.domain.Usuario;
-import com.criollofood.bootapp.utils.UsuarioRowMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import oracle.jdbc.OracleTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
@@ -17,12 +15,10 @@ import java.util.Collections;
 import java.util.Map;
 
 @Component
-public class FindUsuarioByUsernameSP extends StoredProcedure {
-    private static final Logger LOGGER = LogManager.getLogger(FindUsuarioByUsernameSP.class);
+public class ObtenerUsuarioByUsernameSP extends StoredProcedure {
 
-    public FindUsuarioByUsernameSP(@Autowired DataSource dataSource,
-                                   @Autowired UsuarioRowMapper rowMapper) {
-        super(dataSource, "FIND_USUARIO_BY_USERNAME");
+    public ObtenerUsuarioByUsernameSP(@Autowired DataSource dataSource) {
+        super(dataSource, "OBTENER_USUARIO_BY_USERNAME");
 
         declareParameter(new SqlParameter("i_username", Types.VARCHAR));
         declareParameter(new SqlOutParameter("o_user_id", Types.NUMERIC));
@@ -30,20 +26,27 @@ public class FindUsuarioByUsernameSP extends StoredProcedure {
         declareParameter(new SqlOutParameter("o_first_name", Types.VARCHAR));
         declareParameter(new SqlOutParameter("o_last_name", Types.VARCHAR));
         declareParameter(new SqlOutParameter("o_email", Types.VARCHAR));
+        declareParameter(new SqlOutParameter("o_sql_code", OracleTypes.NUMBER));
         compile();
     }
 
     public Usuario execute(String username) {
         Map<String, Object> resultMap = super.execute(Collections.singletonMap("i_username", username));
+        BigDecimal resultSqlCode = (BigDecimal) resultMap.get("o_sql_code");
 
-        Usuario mappedUsuario = new Usuario();
+        if (resultSqlCode.compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
 
-        mappedUsuario.setId((BigDecimal) resultMap.get("o_user_id"));
-        mappedUsuario.setUsername(username);
-        mappedUsuario.setPassword((String) resultMap.get("o_password"));
-        mappedUsuario.setEmail((String) resultMap.get("o_email"));
+        Usuario usuario = new Usuario();
 
-        return mappedUsuario;
+        usuario.setId((BigDecimal) resultMap.get("o_user_id"));
+        usuario.setUsername(username);
+        usuario.setPassword((String) resultMap.get("o_password"));
+        usuario.setFirstName((String) resultMap.get("o_first_name"));
+        usuario.setLastName((String) resultMap.get("o_last_name"));
+        usuario.setEmail((String) resultMap.get("o_email"));
+
+        return usuario;
     }
-
 }

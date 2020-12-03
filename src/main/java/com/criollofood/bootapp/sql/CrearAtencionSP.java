@@ -20,23 +20,30 @@ public class CrearAtencionSP extends StoredProcedure {
     public CrearAtencionSP(@Autowired DataSource dataSource) {
         super(dataSource, "CREAR_ATENCION");
 
-        declareParameter(new SqlParameter("i_cliente_id", OracleTypes.NUMBER));
+        declareParameter(new SqlParameter("i_reservacion_id", OracleTypes.NUMBER));
         declareParameter(new SqlParameter("i_mesa_id", OracleTypes.NUMBER));
         declareParameter(new SqlOutParameter("o_atencion_id", OracleTypes.NUMBER));
         declareParameter(new SqlOutParameter("o_sql_code", OracleTypes.NUMBER));
         compile();
     }
 
-    public boolean execute(Atencion atencion) {
+    public Atencion execute(BigDecimal reservacionId, BigDecimal mesaId) {
         Map<String, Object> parametersMap = new HashMap<>(Collections.emptyMap());
 
-        parametersMap.put("i_cliente_id", atencion.getClienteId());
-        parametersMap.put("i_mesa_id", atencion.getNumeroMesa());
+        parametersMap.put("i_reservacion_id", reservacionId);
+        parametersMap.put("i_mesa_id", mesaId);
 
         Map<String, Object> resultMap = super.execute(parametersMap);
+
         BigDecimal resultSqlCode = (BigDecimal) resultMap.get("o_sql_code");
+        if (resultSqlCode.compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
 
-        return resultSqlCode.compareTo(BigDecimal.ONE) == 0;
+        Atencion atencion = new Atencion();
+        atencion.setId((BigDecimal) resultMap.get("o_atencion_id"));
+        atencion.setNumeroMesa(mesaId);
+
+        return atencion;
     }
-
 }

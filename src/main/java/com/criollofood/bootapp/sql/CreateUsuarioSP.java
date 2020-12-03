@@ -18,7 +18,7 @@ import java.util.Map;
 public class CreateUsuarioSP extends StoredProcedure {
 
     public CreateUsuarioSP(@Autowired DataSource dataSource) {
-        super(dataSource, "CREATE_USUARIO");
+        super(dataSource, "CREAR_USUARIO");
 
         declareParameter(new SqlParameter("i_username", OracleTypes.VARCHAR));
         declareParameter(new SqlParameter("i_password", OracleTypes.VARCHAR));
@@ -42,7 +42,7 @@ public class CreateUsuarioSP extends StoredProcedure {
         parametersMap.put("i_email", usuario.getEmail());
         parametersMap.put("i_is_superuser", 1);
         parametersMap.put("i_is_staff", 1);
-        parametersMap.put("i_grupo_id", 2);
+        parametersMap.put("i_grupo_id", 1);
 
         Map<String, Object> resultMap = super.execute(parametersMap);
         BigDecimal resultSqlCode = (BigDecimal) resultMap.get("o_sql_code");

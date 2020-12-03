@@ -1,10 +1,8 @@
 package com.criollofood.bootapp.controller;
 
 import com.criollofood.bootapp.domain.PedidoCocina;
-import com.criollofood.bootapp.domain.Receta;
 import com.criollofood.bootapp.service.PedidoService;
-import com.criollofood.bootapp.service.RecetaService;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -13,10 +11,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
-@AllArgsConstructor
 public class CocinaController {
-
     private final PedidoService pedidoService;
+
+    public CocinaController(@Autowired PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
+    }
 
     @GetMapping("/cocina")
     public ModelAndView cocina() {

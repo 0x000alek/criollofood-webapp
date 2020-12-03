@@ -1,54 +1,37 @@
 package com.criollofood.bootapp.service;
 
 import com.criollofood.bootapp.domain.Usuario;
-import com.criollofood.bootapp.sql.CreateUsuarioSP;
-import com.criollofood.bootapp.sql.FindUsuarioByUsernameSP;
-import com.criollofood.bootapp.sql.ValidateUsuarioExistsSP;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.criollofood.bootapp.sql.LoginUsuarioSP;
+import com.criollofood.bootapp.sql.ObtenerUsuarioByUsernameSP;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.Objects;
 
 @Service
 public class UsuarioService {
-    private static final Logger LOGGER = LogManager.getLogger(UsuarioService.class);
-
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final GrupoService grupoService;
+    private final ObtenerUsuarioByUsernameSP obtenerUsuarioByUsernameSP;
+    private final LoginUsuarioSP loginUsuarioSP;
 
-    @Autowired
-    private CreateUsuarioSP createUsuarioSP;
-    @Autowired
-    private FindUsuarioByUsernameSP findUsuarioByUsernameSP;
-    @Autowired
-    private ValidateUsuarioExistsSP validateUsuarioExistsSP;
-
-    public UsuarioService(@Autowired BCryptPasswordEncoder bCryptPasswordEncoder,
-                          @Autowired GrupoService grupoService) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    public UsuarioService(@Autowired GrupoService grupoService,
+                          @Autowired ObtenerUsuarioByUsernameSP obtenerUsuarioByUsernameSP,
+                          @Autowired LoginUsuarioSP loginUsuarioSP) {
         this.grupoService = grupoService;
-    }
-
-    public Usuario createUsuario(Usuario usuario) {
-        usuario.setPassword(bCryptPasswordEncoder.encode(usuario.getPassword()));
-        createUsuarioSP.execute(usuario);
-
-        return findByUsername(usuario.getUsername());
+        this.obtenerUsuarioByUsernameSP = obtenerUsuarioByUsernameSP;
+        this.loginUsuarioSP = loginUsuarioSP;
     }
 
     public Usuario findByUsername(String username) {
-        if (isUsuarioExists(username)) {
-            Usuario foundUsuario = findUsuarioByUsernameSP.execute(username);
-            foundUsuario.setGrupos(grupoService.findByIdUsuario(foundUsuario.getId()));
-
-            return foundUsuario;
+        Usuario usuario = obtenerUsuarioByUsernameSP.execute(username);
+        if (!Objects.isNull(usuario)) {
+            usuario.setGrupos(grupoService.findByIdUsuario(usuario.getId()));
         }
-        return null;
+        return usuario;
     }
 
-    public boolean isUsuarioExists(String username) {
-        return validateUsuarioExistsSP.execute(username);
+    public boolean updateLastLogin(BigDecimal usuarioId) {
+        return loginUsuarioSP.execute(usuarioId);
     }
-
 }

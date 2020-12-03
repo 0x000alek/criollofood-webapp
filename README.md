@@ -17,10 +17,9 @@ echo $JAVA_HOME
 #### Archivo properties
 Se requiere modificar el archivo de propiedades **application.properties** conforme al siguiente contenido:
 ```
-oracle.criollofood.datasource.url=jdbc:oracle:thin:@//localhost:32118/XEPDB1
-oracle.criollofood.datasource.username=SIGLOXXI
-oracle.criollofood.datasource.password=sigloxxi
+oracle.criollofood.datasource.url=jdbc:oracle:thin:@dbcf_high
+oracle.criollofood.datasource.username=admin
+oracle.criollofood.datasource.password=DuocUC..2020
 oracle.criollofood.datasource.driver-class-name=oracle.jdbc.OracleDriver
-oracle.criollofood.datasource.wallet-location=/Users/0x000alek/Git/config/Wallet_DBCF
-oracle.criollofood.datasource.wallet-connection=false
+oracle.criollofood.datasource.wallet-location=../config/Wallet_DBCF
 ```

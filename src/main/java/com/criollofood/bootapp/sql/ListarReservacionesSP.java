@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ListarReservacionesByIdCliente extends StoredProcedure {
+public class ListarReservacionesSP extends StoredProcedure {
 
-    public ListarReservacionesByIdCliente(@Autowired DataSource dataSource) {
-        super(dataSource, "LISTAR_RESERVACIONES_BY_ID_CLIENTE");
+    public ListarReservacionesSP(@Autowired DataSource dataSource) {
+        super(dataSource, "LISTAR_RESERVACIONES");
 
-        declareParameter(new SqlParameter("i_cliente_id", OracleTypes.NUMBER));
         declareParameter(
                 new SqlOutParameter("o_reservaciones_cursor", OracleTypes.CURSOR,
                         BeanPropertyRowMapper.newInstance(Reservacion.class))
@@ -29,8 +28,9 @@ public class ListarReservacionesByIdCliente extends StoredProcedure {
         compile();
     }
 
-    public List<Reservacion> execute(BigDecimal idCliente) {
-        Map<String, Object> resultMap = super.execute(Collections.singletonMap("i_cliente_id", idCliente));
+    @SuppressWarnings("unchecked")
+    public List<Reservacion> execute() {
+        Map<String, Object> resultMap = super.execute(Collections.emptyMap());
         return (List<Reservacion>) resultMap.get("o_reservaciones_cursor");
     }
 }
