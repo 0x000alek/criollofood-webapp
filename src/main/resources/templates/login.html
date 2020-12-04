@@ -7,13 +7,13 @@
 <body>
 <div class="container">
     <img th:src="@{/images/criollo-food-logo.png}" class="mx-auto d-block" width="300" height="300" alt="Logo"/>
-    <form th:action="@{/login}" method="POST" class="form-signin" th:autocomplete="off" th:object="${usuario}">
+    <form th:action="@{/login}" method="POST" class="form-signin" th:autocomplete="off">
         <div class="input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text bg-transparent border-right-0"><i class="fa fa-user"></i></span>
             </div>
             <input type="text" id="user_name" name="username" th:placeholder="Usuario"
-                   class="form-control border-left-0" th:field="*{username}"/>
+                   class="form-control border-left-0"/>
         </div>
         <br/>
         <div class="input-group">
@@ -21,7 +21,7 @@
                 <span class="input-group-text bg-transparent border-right-0"><i class="fa fa-lock"></i></span>
             </div>
             <input type="password" id="password" name="password" th:placeholder="Contraseña"
-                   class="form-control border-left-0 mb-0" th:field="*{password}"/>
+                   class="form-control border-left-0 mb-0"/>
         </div>
         <br/>
 

@@ -21,8 +21,9 @@ public class HomeController {
     @GetMapping(value= "/")
     public ModelAndView home(){
         ModelAndView modelAndView = new ModelAndView();
-        if (!authenticationFacade.isAuthenticated()) {
-            modelAndView.setViewName("redirect:/login");
+        modelAndView.setViewName("index");
+        if (authenticationFacade.hasAuthority("ADMINISTRADOR")) {
+            modelAndView.setViewName("redirect:/reporteria");
         } else if (authenticationFacade.hasAuthority("RECEPCION")) {
             modelAndView.setViewName("redirect:/recepcion");
         } else if (authenticationFacade.hasAuthority("COCINA")) {
@@ -37,5 +38,10 @@ public class HomeController {
     @GetMapping(value= "/index")
     public ModelAndView index(){
         return new ModelAndView("redirect:/");
+    }
+
+    @GetMapping(value= "/403")
+    public ModelAndView forbidden(){
+        return new ModelAndView("403");
     }
 }

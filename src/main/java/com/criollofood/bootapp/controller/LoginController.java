@@ -40,6 +40,7 @@ public class LoginController {
         return modelAndView;
     }
 
+    /*
     @PostMapping(value = "/login")
     public ModelAndView login(@Valid @ModelAttribute Usuario usuario,
                               BindingResult bindingResult) {
@@ -60,5 +61,5 @@ public class LoginController {
         }
 
         return modelAndView;
-    }
+    }*/
 }

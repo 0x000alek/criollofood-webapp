@@ -16,10 +16,10 @@ import java.util.Collections;
 import java.util.HashSet;
 
 @Component
-public class LoginPageFilter extends GenericFilterBean {
+public class CriolloFoodLoginPageFilter extends GenericFilterBean {
     private final AuthenticationFacade authenticationFacade;
 
-    public LoginPageFilter(@Autowired AuthenticationFacade authenticationFacade) {
+    public CriolloFoodLoginPageFilter(@Autowired AuthenticationFacade authenticationFacade) {
         this.authenticationFacade = authenticationFacade;
     }
 

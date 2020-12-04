@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class CriolloFoodUserDetailsService implements UserDetailsService {
-
     private final UsuarioService usuarioService;
 
     public CriolloFoodUserDetailsService(@Autowired UsuarioService usuarioService) {
