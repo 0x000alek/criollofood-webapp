@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <div th:replace="fragments/header :: header"></div>
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar ('reporteria')"></div>
+<div class="px-5">
+    <div class="row">
+        <h2 class="mx-auto pt-3 m-0">REPORTERÍA</h2>
+    </div>
+    <hr class="border">
+
+    <div class="row justify-content-between m-1" style="min-height: 540px">
+        <div class="col-4 shadow p-3 rounded m-n1" style="background-color: #9ad3bc">
+            <h2 class="mb-4">Reportes</h2>
+            <div id="caja" class="reporte shadow mb-2 p-3 rounded" th:classappend="${reporte} == 'caja' ? 'bg-primary' :'bg-white'" th:onclick="window.location.href='/reporteria/'+this.id">
+                Rendimiento de Caja
+            </div>
+            <div id="atencion" class="reporte shadow mb-2 p-3 rounded" th:classappend="${reporte} == 'atencion' ? 'bg-primary' :'bg-white'" th:onclick="window.location.href='/reporteria/'+this.id">
+                Atención de clientes
+            </div>
+            <div id="rentabilidad" class="reporte shadow mb-2 p-3 rounded" th:classappend="${reporte} == 'rentabilidad' ? 'bg-primary' :'bg-white'" th:onclick="window.location.href='/reporteria/'+this.id">
+                Rentabilidad
+            </div>
+        </div>
+
+        <div class="col-8 shadow bg-light p-3 rounded m-n1">
+<!--            <div th:replace="fragments/reporte-formulario :: form-reporte (${reporte})"></div>-->
+            <div class="col-8">
+                <h2 th:if="${reporte} == 'caja'">Rendimiento de Caja</h2>
+                <h2 th:if="${reporte} == 'atencion'">Atención de clientes</h2>
+                <h2 th:if="${reporte} == 'rentabilidad'">Rentabilidad</h2>
+                <form th:action="${reporte}+'/descargar'" th:target="_blank">
+                    <div class="form-group">
+                        <label for="fechaDesde">Fecha Desde</label>
+                        <input type="date" name="fechaDesde" class="form-control" id="fechaDesde" aria-describedby="fechaDesde" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaHasta">Fecha Hasta</label>
+                        <input type="date" name="fechaHasta" class="form-control" id="fechaHasta" aria-describedby="fechaHasta" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Descargar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <hr class="border">
+
+</div>
+
+<div th:insert="fragments/common-scripts :: common-scripts"></div>
+</body>
+
+</html>

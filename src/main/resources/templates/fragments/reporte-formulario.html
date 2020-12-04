@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
+<body>
+<div th:fragment="form-reporte (reporte)">
+    <div class="col-8">
+        <h2 th:if="${reporte} == 'caja'">Rendimiento de Caja</h2>
+        <h2 th:if="${reporte} == 'atencion'">Atención de clientes</h2>
+        <h2 th:if="${reporte} == 'rentabilidad'">Rentabilidad</h2>
+        <form th:action="@{${reporte}/descargar}" method="post">
+            <div class="form-group">
+                <label for="fechaDesde">Fecha Desde</label>
+                <input type="date" name="fechaDesde" class="form-control" id="fechaDesde" aria-describedby="fechaDesde" required>
+            </div>
+            <div class="form-group">
+                <label for="fechaHasta">Fecha Hasta</label>
+                <input type="date" name="fechaHasta" class="form-control" id="fechaHasta" aria-describedby="fechaHasta" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Descargar</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
