@@ -315,7 +315,7 @@ BEGIN
     where NUMERO_MESA = i_mesa_id;
 
     update CORE_RESERVACION
-        set ESTADO = 'TOMADA'
+        set ESTADO = 'ASIGNADA'
     where ID = i_reservacion_id;
 
     o_atencion_id := v_id_atencion;
@@ -358,7 +358,7 @@ BEGIN
     v_fecha_ingreso := CURRENT_TIMESTAMP;
 
     insert into ATENCION_PEDIDO (ESTADO, FECHA_INGRESO, ATENCION_ID)
-    values ('INGRESADO', v_fecha_ingreso, i_atencion_id);
+    values ('PENDIENTE', v_fecha_ingreso, i_atencion_id);
 
     select ID into v_pedido_id from ATENCION_PEDIDO where FECHA_INGRESO = v_fecha_ingreso;
 
